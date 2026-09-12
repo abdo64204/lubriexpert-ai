@@ -1,0 +1,277 @@
+// ============================================================
+// LubriExpert AI — Global Styles
+// Professional engineering/automotive SaaS design
+// ============================================================
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+Arabic:wght@300;400;500;600;700&display=swap');
+
+// ============================================================
+// CSS Custom Properties — Light Theme (default)
+// ============================================================
+:root {
+  // Brand
+  --color-primary: #1a6fc4;
+  --color-primary-dark: #1558a0;
+  --color-primary-light: rgba(26, 111, 196, 0.1);
+  --color-accent: #f0a500;
+  --color-success: #38a169;
+  --color-danger: #e53e3e;
+
+  // Backgrounds
+  --bg-app: #f0f2f5;
+  --bg-sidebar: #ffffff;
+  --bg-chat: #f8f9fb;
+  --bg-card: #ffffff;
+  --bg-input: #ffffff;
+  --bg-header: #ffffff;
+  --bg-hover: #f0f4f8;
+  --bg-user-bubble: #1a6fc4;
+  --bg-ai-bubble: #ffffff;
+  --bg-quick-action: #f4f6f9;
+
+  // Text
+  --text-primary: #1a1d23;
+  --text-secondary: #4a5568;
+  --text-muted: #718096;
+  --text-user-bubble: #ffffff;
+  --text-ai-bubble: #1a1d23;
+  --text-link: #1a6fc4;
+
+  // Borders
+  --border-color: #e2e8f0;
+  --border-color-strong: #cbd5e0;
+  --border-focus: #1a6fc4;
+
+  // Shadows
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.07), 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.09);
+  --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.12);
+
+  // Layout
+  --sidebar-width: 280px;
+  --header-height: 62px;
+  --border-radius: 12px;
+  --border-radius-sm: 8px;
+  --border-radius-lg: 18px;
+
+  // Misc
+  --typing-dot: #a0aec0;
+  --scrollbar-thumb: #cbd5e0;
+  --transition: 0.15s ease;
+}
+
+// ============================================================
+// Dark Theme
+// ============================================================
+[data-theme='dark'] {
+  --bg-app: #0d0f14;
+  --bg-sidebar: #161820;
+  --bg-chat: #111318;
+  --bg-card: #1c1e27;
+  --bg-input: #1c1e27;
+  --bg-header: #161820;
+  --bg-hover: #232633;
+  --bg-user-bubble: #1a6fc4;
+  --bg-ai-bubble: #1c1e27;
+  --bg-quick-action: #1c1e27;
+
+  --text-primary: #e8eaf0;
+  --text-secondary: #9aa0b8;
+  --text-muted: #636880;
+  --text-user-bubble: #ffffff;
+  --text-ai-bubble: #e8eaf0;
+  --text-link: #5ba3e8;
+
+  --border-color: #252833;
+  --border-color-strong: #363a4e;
+
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.6);
+
+  --typing-dot: #636880;
+  --scrollbar-thumb: #363a4e;
+}
+
+// ============================================================
+// Base Reset
+// ============================================================
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+  height: 100%;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--bg-app);
+  color: var(--text-primary);
+  line-height: 1.6;
+  height: 100%;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background-color var(--transition), color var(--transition);
+}
+
+body[dir='rtl'],
+[dir='rtl'] {
+  font-family: 'Noto Sans Arabic', 'Inter', sans-serif;
+}
+
+// ============================================================
+// Scrollbars
+// ============================================================
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 3px;
+}
+
+// ============================================================
+// Markdown Content (inside AI bubbles)
+// ============================================================
+.markdown-content {
+  line-height: 1.75;
+  font-size: 0.9rem;
+
+  h1, h2, h3 {
+    margin: 1em 0 0.5em;
+    font-weight: 600;
+    line-height: 1.3;
+  }
+  h1 { font-size: 1.2em; }
+  h2 { font-size: 1.1em; }
+  h3 { font-size: 1em; }
+
+  p {
+    margin: 0 0 0.65em;
+    &:last-child { margin-bottom: 0; }
+  }
+
+  ul, ol {
+    margin: 0.4em 0 0.65em;
+    padding-inline-start: 1.4em;
+  }
+
+  li { margin-bottom: 0.2em; }
+
+  strong { font-weight: 600; }
+  em { font-style: italic; }
+
+  code {
+    font-family: 'SF Mono', 'Fira Code', 'Courier New', monospace;
+    background: var(--bg-hover);
+    padding: 0.15em 0.4em;
+    border-radius: 4px;
+    font-size: 0.85em;
+    color: var(--color-primary);
+  }
+
+  pre {
+    background: var(--bg-hover);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-sm);
+    padding: 0.85em 1em;
+    overflow-x: auto;
+    margin: 0.65em 0;
+
+    code {
+      background: none;
+      padding: 0;
+      color: inherit;
+      font-size: 0.85em;
+    }
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0.65em 0;
+    font-size: 0.88em;
+
+    th, td {
+      border: 1px solid var(--border-color);
+      padding: 0.45em 0.7em;
+      text-align: start;
+    }
+    th {
+      background: var(--bg-hover);
+      font-weight: 600;
+    }
+    tr:nth-child(even) td { background: rgba(0,0,0,0.02); }
+  }
+
+  blockquote {
+    border-inline-start: 3px solid var(--color-primary);
+    padding-inline-start: 1em;
+    color: var(--text-secondary);
+    margin: 0.65em 0;
+    font-style: italic;
+  }
+
+  hr {
+    border: none;
+    border-top: 1px solid var(--border-color);
+    margin: 0.9em 0;
+  }
+}
+
+// ============================================================
+// Button Base
+// ============================================================
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border: none;
+  border-radius: var(--border-radius-sm);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition);
+  font-family: inherit;
+  line-height: 1;
+  white-space: nowrap;
+  text-decoration: none;
+
+  &:disabled { opacity: 0.45; cursor: not-allowed; }
+
+  &.btn-primary {
+    background: var(--color-primary);
+    color: white;
+    &:hover:not(:disabled) { background: var(--color-primary-dark); }
+  }
+
+  &.btn-ghost {
+    background: transparent;
+    color: var(--text-secondary);
+    &:hover:not(:disabled) { background: var(--bg-hover); color: var(--text-primary); }
+  }
+
+  &.btn-icon {
+    padding: 6px;
+    border-radius: var(--border-radius-sm);
+    width: 34px;
+    height: 34px;
+    justify-content: center;
+    font-size: 1rem;
+  }
+}
+
+// ============================================================
+// App Root Layout
+// ============================================================
+app-root {
+  display: block;
+  height: 100vh;
+  overflow: hidden;
+}
