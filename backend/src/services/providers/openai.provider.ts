@@ -16,6 +16,38 @@ import { env } from '../../config/environment';
  *   AI_MODEL     — model name (e.g., gpt-4o)
  *   AI_BASE_URL  — base URL (defaults to https://api.openai.com/v1)
  */
+function sanitizeApiKey(raw: string): string {
+  if (!raw) return '';
+  let k = raw.trim();
+  while (
+    (k.startsWith('"') && k.endsWith('"')) ||
+    (k.startsWith("'") && k.endsWith("'")) ||
+    (k.startsWith('`') && k.endsWith('`'))
+  ) {
+    k = k.slice(1, -1).trim();
+  }
+  k = k.replace(/[;,]+$/, '').trim();
+  if (k.toLowerCase().startsWith('bearer ')) {
+    k = k.slice(7).trim();
+  }
+  return k;
+}
+
+function sanitizeBaseUrl(raw: string): string {
+  if (!raw) return 'https://generativelanguage.googleapis.com/v1beta/openai/';
+  let u = raw.trim();
+  while (
+    (u.startsWith('"') && u.endsWith('"')) ||
+    (u.startsWith("'") && u.endsWith("'"))
+  ) {
+    u = u.slice(1, -1).trim();
+  }
+  if (u.includes('generativelanguage.googleapis.com') && !u.includes('/openai')) {
+    u = u.replace(/\/+$/, '') + '/openai';
+  }
+  return u.replace(/\/+$/, '') + '/';
+}
+
 export class OpenAIProvider implements AIProvider {
   readonly name: string;
   private client: OpenAI | null = null;
@@ -26,18 +58,68 @@ export class OpenAIProvider implements AIProvider {
 
   private getClient(): OpenAI {
     if (!this.client) {
+      const cleanedKey = sanitizeApiKey(env.aiApiKey);
+      const cleanedBaseUrl = sanitizeBaseUrl(env.aiBaseUrl);
+
+      // Custom fetch interceptor:
+      // 1. Injects clean Authorization and x-goog-api-key headers
+      // 2. Unwraps Google's array error format [ { error: ... } ] so OpenAI SDK parses the true error message
+      // 3. Logs safe server-side diagnostics without leaking credentials
+      const customFetch = async (url: any, init?: any): Promise<any> => {
+        const headers = new Headers(init?.headers || {});
+        headers.set('Authorization', `Bearer ${cleanedKey}`);
+        if (this.name.includes('gemini') || cleanedBaseUrl.includes('googleapis.com')) {
+          headers.set('x-goog-api-key', cleanedKey);
+        }
+
+        const res = await fetch(url, { ...init, headers });
+        if (!res.ok) {
+          try {
+            const clone = res.clone();
+            const text = await clone.text();
+            let parsed: any;
+            try { parsed = JSON.parse(text); } catch { parsed = null; }
+
+            if (Array.isArray(parsed) && parsed[0]?.error) {
+              parsed = parsed[0];
+            }
+
+            const safeMsg = parsed?.error?.message ?? res.statusText;
+            const safeStatus = parsed?.error?.status ?? 'UNKNOWN';
+
+            // Safe server-side diagnostic — NEVER logs the actual API key or auth headers
+            console.warn(`[Google API Diagnostic] HTTP ${res.status}: ${safeMsg} (${safeStatus})`);
+
+            if (parsed) {
+              const resHeaders = new Headers(res.headers);
+              resHeaders.set('content-type', 'application/json');
+              return new Response(JSON.stringify(parsed), {
+                status: res.status,
+                statusText: res.statusText,
+                headers: resHeaders,
+              });
+            }
+          } catch {
+            // If response parsing fails, pass through original response
+          }
+        }
+        return res;
+      };
+
       this.client = new OpenAI({
-        apiKey: env.aiApiKey.trim(),
-        baseURL: env.aiBaseUrl.trim(),
-        timeout: 15000, // 15s timeout per request — prevents hanging serverless instances
-        maxRetries: 0,  // We manage retries and model fallbacks explicitly
+        apiKey: cleanedKey,
+        baseURL: cleanedBaseUrl,
+        timeout: 15000, // 15s timeout per request
+        maxRetries: 0,  // Controlled fallback across candidate models
+        fetch: customFetch as any,
       });
     }
     return this.client;
   }
 
   isConfigured(): boolean {
-    return Boolean(env.aiApiKey && env.aiApiKey.trim().length > 0);
+    const key = sanitizeApiKey(env.aiApiKey);
+    return Boolean(key && key.length > 0);
   }
 
   /**
@@ -56,9 +138,8 @@ export class OpenAIProvider implements AIProvider {
       const geminiFallbacks = [
         primaryModel,
         'gemini-flash-lite-latest',
-        'gemini-3.7-flash',
         'gemini-3.5-flash-lite',
-        'gemini-3.8-flash',
+        'gemini-3.7-flash',
       ].filter(Boolean);
 
       // Deduplicate while preserving order
@@ -78,12 +159,29 @@ export class OpenAIProvider implements AIProvider {
     const client = this.getClient();
     const candidateModels = this.getCandidateModels(request.model);
 
+    // Sanitize message array to eliminate null/empty content or invalid roles that cause HTTP 400
+    const sanitizedMessages = request.messages
+      .filter((msg) => msg && typeof msg.content === 'string' && msg.content.trim().length > 0)
+      .map((msg) => ({
+        role: (msg.role === 'assistant' || msg.role === 'system' ? msg.role : 'user') as 'user' | 'assistant' | 'system',
+        content: msg.content.trim(),
+      }));
+
+    const messagesToSend =
+      sanitizedMessages.length > 0
+        ? sanitizedMessages
+        : [{ role: 'user' as const, content: 'Hello' }];
+
     let endpointHost = 'default';
     try {
       endpointHost = env.aiBaseUrl ? new URL(env.aiBaseUrl).hostname : 'default';
     } catch {
       endpointHost = 'invalid-url';
     }
+
+    const totalMessageContentLength = messagesToSend.reduce((acc, m) => acc + m.content.length, 0);
+    const messageRoles = messagesToSend.map((m) => m.role);
+    const payloadParams = ['model', 'messages', 'max_tokens', 'temperature'];
 
     let lastError: any = null;
     const overallStartTime = Date.now();
@@ -93,14 +191,16 @@ export class OpenAIProvider implements AIProvider {
       const attemptStartTime = Date.now();
 
       try {
-        console.log(`[AI Provider] Invoking model "${model}" on host "${endpointHost}"...`);
+        // Safe sanitized request diagnostic — contains NO credentials, API keys, or raw message text
+        console.log(
+          `[AI Request Diagnostic] Model: "${model}", Host: "${endpointHost}", ` +
+          `Roles: [${messageRoles.join(', ')}], ContentLength: ${totalMessageContentLength}, ` +
+          `Parameters: [${payloadParams.join(', ')}]`
+        );
 
         const completion = await client.chat.completions.create({
           model,
-          messages: request.messages.map((msg) => ({
-            role: msg.role,
-            content: msg.content,
-          })),
+          messages: messagesToSend,
           max_tokens: request.maxTokens ?? 2048,
           temperature: request.temperature ?? 0.7,
         });
@@ -118,7 +218,8 @@ export class OpenAIProvider implements AIProvider {
 
         const duration = Date.now() - attemptStartTime;
         console.log(
-          `[AI Provider Success] Response generated using model "${model}" via "${endpointHost}" in ${duration}ms.`
+          `[AI Response Diagnostic] Model: "${model}", Host: "${endpointHost}", ` +
+          `Status: 200, Timing: ${duration}ms`
         );
 
         return {
@@ -143,7 +244,7 @@ export class OpenAIProvider implements AIProvider {
         console.warn(
           `[AI Provider Fallback] Model "${model}" failed on "${endpointHost}". ` +
           `Status: ${status}, Type: ${errType}, Error: ${errMsg}. ` +
-          `Duration: ${duration}ms. ${i < candidateModels.length - 1 ? 'Attempting next candidate...' : 'All candidates exhausted.'}`
+          `Timing: ${duration}ms. ${i < candidateModels.length - 1 ? 'Attempting next candidate...' : 'All candidates exhausted.'}`
         );
       }
     }
