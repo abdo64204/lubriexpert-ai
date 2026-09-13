@@ -10,6 +10,10 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/node": "^22.7.5",
+    "@types/uuid": "^10.0.0",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.21.0",
@@ -17,15 +21,11 @@
     "express-validator": "^7.2.0",
     "helmet": "^8.0.0",
     "openai": "^4.67.0",
+    "typescript": "^5.6.3",
     "uuid": "^10.0.0"
   },
   "devDependencies": {
-    "@types/cors": "^2.8.17",
-    "@types/express": "^5.0.0",
-    "@types/node": "^22.7.5",
-    "@types/uuid": "^10.0.0",
     "nodemon": "^3.1.7",
-    "ts-node": "^10.9.2",
-    "typescript": "^5.6.3"
+    "ts-node": "^10.9.2"
   }
 }

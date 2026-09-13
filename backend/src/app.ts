@@ -48,7 +48,7 @@ export function createApp(): express.Application {
   // CORS — only allow requests from the configured frontend URL(s)
   app.use(
     cors({
-      origin: (origin, callback) => {
+      origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
         // Allow requests with no origin (curl, mobile apps, server-to-server, same-origin)
         if (!origin) return callback(null, true);
 
@@ -103,7 +103,7 @@ export function createApp(): express.Application {
     app.all('/api/*', notFoundHandler);
 
     // Serve index.html for all other non-API routes (Angular client-side routing)
-    app.get('*', (_req, res) => {
+    app.get('*', (_req: express.Request, res: express.Response) => {
       res.sendFile(path.join(staticPath, 'index.html'));
     });
   } else {
