@@ -6,19 +6,21 @@ import { Language } from '../../../models/chat.models';
   selector: 'app-language-switcher',
   standalone: true,
   template: `
-    <div class="lang-switcher">
+    <div class="lang-switcher" role="group" aria-label="Language selector">
       <button
         class="lang-btn"
         [class.active]="langService.language() === 'ar'"
         (click)="setLang('ar')"
-        title="Arabic"
+        title="العربية"
+        aria-label="Switch to Arabic"
       >العربية</button>
-      <span class="sep">|</span>
+      <span class="sep" aria-hidden="true">|</span>
       <button
         class="lang-btn"
         [class.active]="langService.language() === 'en'"
         (click)="setLang('en')"
         title="English"
+        aria-label="Switch to English"
       >English</button>
     </div>
   `,
@@ -32,7 +34,7 @@ import { Language } from '../../../models/chat.models';
     .lang-btn {
       background: none;
       border: none;
-      padding: 4px 8px;
+      padding: 5px 8px;
       border-radius: 6px;
       font-size: 0.8rem;
       font-weight: 500;
@@ -41,13 +43,14 @@ import { Language } from '../../../models/chat.models';
       transition: all var(--transition);
       font-family: inherit;
       line-height: 1;
+      touch-action: manipulation;
 
       &.active {
         color: var(--color-primary);
         font-weight: 600;
       }
 
-      &:hover:not(.active) {
+      &:hover:not(.active), &:active {
         background: var(--bg-hover);
         color: var(--text-primary);
       }
@@ -57,6 +60,13 @@ import { Language } from '../../../models/chat.models';
       color: var(--border-color-strong);
       font-size: 0.75rem;
       user-select: none;
+    }
+
+    @media (max-width: 480px) {
+      .lang-btn {
+        padding: 4px 5px;
+        font-size: 0.75rem;
+      }
     }
   `],
 })

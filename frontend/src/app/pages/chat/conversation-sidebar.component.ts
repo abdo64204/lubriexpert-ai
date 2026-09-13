@@ -58,6 +58,7 @@ import { Conversation } from '../../models/chat.models';
   styles: [`
     .sidebar {
       width: var(--sidebar-width);
+      max-width: min(var(--sidebar-width), calc(100vw - 44px));
       height: 100%;
       background: var(--bg-sidebar);
       border-inline-end: 1px solid var(--border-color);
@@ -74,8 +75,10 @@ import { Conversation } from '../../models/chat.models';
 
     .new-chat-btn {
       width: 100%;
+      min-height: 42px;
       display: flex;
       align-items: center;
+      justify-content: center;
       gap: 8px;
       padding: 9px 14px;
       background: var(--color-primary);
@@ -88,6 +91,7 @@ import { Conversation } from '../../models/chat.models';
       transition: background var(--transition);
       font-family: inherit;
       line-height: 1;
+      touch-action: manipulation;
 
       &:hover { background: var(--color-primary-dark); }
     }
@@ -96,6 +100,7 @@ import { Conversation } from '../../models/chat.models';
       flex: 1;
       overflow-y: auto;
       padding: 8px;
+      -webkit-overflow-scrolling: touch;
     }
 
     .section-label {
@@ -119,11 +124,13 @@ import { Conversation } from '../../models/chat.models';
       display: flex;
       align-items: center;
       gap: 6px;
-      padding: 9px 10px;
+      padding: 10px 10px;
+      min-height: 44px;
       border-radius: var(--border-radius-sm);
       cursor: pointer;
       transition: background var(--transition);
-      margin-bottom: 1px;
+      margin-bottom: 2px;
+      touch-action: manipulation;
 
       &:hover, &.active { background: var(--bg-hover); }
       &:hover .del-btn { opacity: 1; }
@@ -154,20 +161,30 @@ import { Conversation } from '../../models/chat.models';
     .del-btn {
       background: none;
       border: none;
-      padding: 3px;
+      padding: 6px;
+      min-width: 32px;
+      min-height: 32px;
       cursor: pointer;
       border-radius: 4px;
-      font-size: 0.75rem;
+      font-size: 0.8rem;
       opacity: 0;
       transition: opacity var(--transition), background var(--transition);
       flex-shrink: 0;
       line-height: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      touch-action: manipulation;
 
       &:hover { background: var(--bg-hover); opacity: 1 !important; }
     }
 
+    @media (hover: none), (max-width: 768px) {
+      .del-btn { opacity: 0.7; }
+    }
+
     .sb-footer {
-      padding: 10px 14px;
+      padding: 10px 14px max(10px, env(safe-area-inset-bottom));
       border-top: 1px solid var(--border-color);
     }
 

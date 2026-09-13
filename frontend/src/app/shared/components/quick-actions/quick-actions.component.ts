@@ -43,8 +43,9 @@ import { LanguageService } from '../../../services/language.service';
       font-family: inherit;
       white-space: nowrap;
       line-height: 1;
+      touch-action: manipulation;
 
-      &:hover {
+      &:hover, &:active {
         background: var(--color-primary);
         color: white;
         border-color: var(--color-primary);
@@ -53,6 +54,23 @@ import { LanguageService } from '../../../services/language.service';
       }
 
       .chip-icon { font-size: 0.9rem; }
+    }
+
+    @media (max-width: 640px) {
+      .quick-actions {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        justify-content: flex-start;
+        padding: 4px 2px 8px;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        &::-webkit-scrollbar { display: none; }
+      }
+      .chip {
+        padding: 6px 11px;
+        font-size: 0.76rem;
+        flex-shrink: 0;
+      }
     }
   `],
 })

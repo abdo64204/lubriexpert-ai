@@ -1,4 +1,4 @@
-import { Component, ViewChild, inject, OnInit, signal } from '@angular/core';
+import { Component, ViewChild, inject, OnInit, signal, effect } from '@angular/core';
 import { NgIf } from '@angular/common';
 import { AppHeaderComponent } from '../../shared/components/header/app-header.component';
 import { ConversationSidebarComponent } from './conversation-sidebar.component';
@@ -9,46 +9,126 @@ import { ChatMessage } from '../../models/chat.models';
 import { ChatService } from '../../services/chat.service';
 import { ConversationService } from '../../services/conversation.service';
 import { LanguageService } from '../../services/language.service';
+import { ViewportService } from '../../services/viewport.service';
 
 @Component({
   selector: 'app-chat',
   standalone: true,
   imports: [NgIf, AppHeaderComponent, ConversationSidebarComponent, ChatWindowComponent, ChatInputComponent, QuickActionsComponent],
   template: `
-    <div class="chat-layout" [class.sidebar-open]="sidebarOpen">
+    <div class="chat-layout" [class.sidebar-open]="sidebarOpen" [class.keyboard-open]="viewportService.isKeyboardVisible()">
       <app-conversation-sidebar class="sidebar-component" (closed)="onConversationSelected()" />
       <div class="sidebar-overlay" *ngIf="sidebarOpen" (click)="sidebarOpen = false"></div>
       <div class="main-area">
         <app-header />
-        <button class="mobile-sidebar-btn" (click)="sidebarOpen = !sidebarOpen">☰</button>
+        <button class="mobile-sidebar-btn" (click)="sidebarOpen = !sidebarOpen" aria-label="Toggle Conversations">☰</button>
         <div class="chat-body">
           <app-chat-window #chatWindow [messages]="currentMessages()" [isLoading]="isLoading()"
             (exampleClicked)="onExampleOrQuickAction($event)" (regenerate)="onRegenerate()" />
           <div class="bottom-area">
-            <div class="quick-actions-bar" *ngIf="currentMessages().length > 0">
+            <div class="quick-actions-bar" *ngIf="currentMessages().length > 0 && !viewportService.isKeyboardVisible()">
               <app-quick-actions (actionClicked)="onExampleOrQuickAction($event)" />
             </div>
-            <app-chat-input #chatInput [isLoading]="isLoading()" (messageSent)="onMessageSent($event)" />
+            <app-chat-input #chatInput [isLoading]="isLoading()" (messageSent)="onMessageSent($event)" (focused)="onInputFocused()" />
           </div>
         </div>
       </div>
     </div>
   `,
   styles: [`
-    .chat-layout { display: flex; height: 100vh; overflow: hidden; }
-    .sidebar-component { display: flex; }
-    .main-area { flex: 1; display: flex; flex-direction: column; min-width: 0; position: relative; }
-    .chat-body { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-    app-chat-window { flex: 1; display: flex; flex-direction: column; min-height: 0; overflow: hidden; }
-    .bottom-area { background: var(--bg-chat); border-top: 1px solid var(--border-color); }
-    .quick-actions-bar { padding: 10px 20px 0; }
-    .mobile-sidebar-btn { display: none; position: absolute; top: 14px; inset-inline-start: 14px; z-index: 200; background: none; border: 1px solid var(--border-color); border-radius: 6px; padding: 6px 10px; cursor: pointer; color: var(--text-secondary); font-size: 1rem; }
+    .chat-layout {
+      display: flex;
+      height: 100%;
+      height: 100dvh;
+      max-height: 100dvh;
+      height: var(--visual-viewport-height, 100dvh);
+      max-height: var(--visual-viewport-height, 100dvh);
+      width: 100%;
+      overflow: hidden;
+      position: relative;
+    }
+    .sidebar-component { display: flex; flex-shrink: 0; }
+    .main-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      min-height: 0;
+      position: relative;
+      overflow: hidden;
+      height: 100%;
+    }
+    .chat-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      overflow: hidden;
+      position: relative;
+    }
+    app-chat-window {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      overflow: hidden;
+    }
+    .bottom-area {
+      background: var(--bg-chat);
+      border-top: 1px solid var(--border-color);
+      flex-shrink: 0;
+      z-index: 10;
+      padding-bottom: max(2px, env(safe-area-inset-bottom));
+    }
+    .quick-actions-bar {
+      padding: 8px 16px 0;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      &::-webkit-scrollbar { display: none; }
+    }
+    .mobile-sidebar-btn {
+      display: none;
+      position: absolute;
+      top: 13px;
+      inset-inline-start: 10px;
+      z-index: 100;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius-sm);
+      padding: 0;
+      width: 36px;
+      height: 36px;
+      cursor: pointer;
+      color: var(--text-secondary);
+      font-size: 1.1rem;
+      align-items: center;
+      justify-content: center;
+      box-shadow: var(--shadow-sm);
+      touch-action: manipulation;
+    }
     .sidebar-overlay { display: none; }
     @media (max-width: 768px) {
-      .sidebar-component { position: fixed; top: 0; inset-inline-start: -280px; height: 100%; z-index: 300; transition: inset-inline-start 0.25s ease; box-shadow: var(--shadow-lg); }
+      .sidebar-component {
+        position: fixed;
+        top: 0;
+        inset-inline-start: -280px;
+        height: 100%;
+        max-width: min(280px, calc(100vw - 44px));
+        z-index: 300;
+        transition: inset-inline-start 0.25s ease;
+        box-shadow: var(--shadow-lg);
+      }
       .chat-layout.sidebar-open .sidebar-component { inset-inline-start: 0; }
       .mobile-sidebar-btn { display: flex; }
-      .sidebar-overlay { display: block; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 200; }
+      .sidebar-overlay {
+        display: block;
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.5);
+        z-index: 200;
+        backdrop-filter: blur(2px);
+      }
     }
   `]
 })
@@ -58,8 +138,23 @@ export class ChatComponent implements OnInit {
   chatService = inject(ChatService);
   convService = inject(ConversationService);
   langService = inject(LanguageService);
+  viewportService = inject(ViewportService);
   isLoading = signal(false);
   sidebarOpen = false;
+
+  constructor() {
+    // When mobile keyboard opens/closes, smoothly scroll to bottom to ensure visibility
+    effect(() => {
+      const isVisible = this.viewportService.isKeyboardVisible();
+      if (isVisible) {
+        setTimeout(() => this.chatWindow?.scrollToBottom('smooth'), 100);
+      }
+    });
+  }
+
+  onInputFocused(): void {
+    setTimeout(() => this.chatWindow?.scrollToBottom('smooth'), 120);
+  }
 
   ngOnInit(): void {
     if (!this.convService.currentConversation()) {

@@ -54,6 +54,12 @@
   --border-radius-sm: 8px;
   --border-radius-lg: 18px;
 
+  // Safe area insets
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+
   // Misc
   --typing-dot: #a0aec0;
   --scrollbar-thumb: #cbd5e0;
@@ -106,6 +112,7 @@ html {
   font-size: 16px;
   scroll-behavior: smooth;
   height: 100%;
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
@@ -114,6 +121,9 @@ body {
   color: var(--text-primary);
   line-height: 1.6;
   height: 100%;
+  min-height: 100%;
+  min-height: 100dvh;
+  min-height: -webkit-fill-available;
   overflow: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -141,6 +151,8 @@ body[dir='rtl'],
 .markdown-content {
   line-height: 1.75;
   font-size: 0.9rem;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 
   h1, h2, h3 {
     margin: 1em 0 0.5em;
@@ -173,6 +185,7 @@ body[dir='rtl'],
     border-radius: 4px;
     font-size: 0.85em;
     color: var(--color-primary);
+    word-break: break-word;
   }
 
   pre {
@@ -181,6 +194,8 @@ body[dir='rtl'],
     border-radius: var(--border-radius-sm);
     padding: 0.85em 1em;
     overflow-x: auto;
+    max-width: 100%;
+    -webkit-overflow-scrolling: touch;
     margin: 0.65em 0;
 
     code {
@@ -188,11 +203,17 @@ body[dir='rtl'],
       padding: 0;
       color: inherit;
       font-size: 0.85em;
+      white-space: pre;
+      word-break: normal;
     }
   }
 
   table {
+    display: block;
     width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
     border-collapse: collapse;
     margin: 0.65em 0;
     font-size: 0.88em;
@@ -242,6 +263,7 @@ body[dir='rtl'],
   line-height: 1;
   white-space: nowrap;
   text-decoration: none;
+  touch-action: manipulation;
 
   &:disabled { opacity: 0.45; cursor: not-allowed; }
 
@@ -260,18 +282,23 @@ body[dir='rtl'],
   &.btn-icon {
     padding: 6px;
     border-radius: var(--border-radius-sm);
-    width: 34px;
-    height: 34px;
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    min-height: 36px;
     justify-content: center;
     font-size: 1rem;
   }
 }
 
 // ============================================================
-// App Root Layout
+// App Root Layout — Dynamic Viewport Height
 // ============================================================
 app-root {
   display: block;
-  height: 100vh;
+  height: 100%;
+  height: 100dvh;
+  max-height: 100dvh;
+  width: 100%;
   overflow: hidden;
 }

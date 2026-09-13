@@ -107,11 +107,12 @@ import { marked } from 'marked';
     }
 
     .bubble-col {
-      max-width: 74%;
+      max-width: 78%;
       display: flex;
       flex-direction: column;
       gap: 4px;
       align-items: flex-start;
+      min-width: 0;
     }
 
     .user-col { align-items: flex-end; }
@@ -124,6 +125,7 @@ import { marked } from 'marked';
       border-radius: var(--border-radius-lg);
       font-size: 0.9rem;
       line-height: 1.65;
+      overflow-wrap: anywhere;
       word-break: break-word;
       max-width: 100%;
     }
@@ -165,7 +167,8 @@ import { marked } from 'marked';
       align-items: center;
       gap: 8px;
       padding: 0 2px;
-      min-height: 20px;
+      min-height: 22px;
+      flex-wrap: wrap;
     }
 
     .ts {
@@ -176,26 +179,50 @@ import { marked } from 'marked';
 
     .actions {
       display: flex;
-      gap: 1px;
+      gap: 2px;
       opacity: 0;
       transition: opacity var(--transition);
     }
 
     .bubble-col:hover .actions { opacity: 1; }
 
+    /* Touch screen support — make actions visible on touch without hover */
+    @media (hover: none), (max-width: 768px) {
+      .actions { opacity: 0.75; }
+    }
+
     .act-btn {
       background: none;
       border: none;
-      padding: 3px 5px;
+      padding: 4px 6px;
+      min-width: 28px;
+      min-height: 28px;
       cursor: pointer;
       border-radius: 5px;
-      font-size: 0.75rem;
-      transition: background var(--transition);
-      opacity: 0.65;
+      font-size: 0.8rem;
+      transition: background var(--transition), opacity var(--transition);
+      opacity: 0.7;
       line-height: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      touch-action: manipulation;
 
-      &:hover { background: var(--bg-hover); opacity: 1; }
+      &:hover, &:active { background: var(--bg-hover); opacity: 1; }
       &.voted { opacity: 1; }
+    }
+
+    @media (max-width: 640px) {
+      .bubble-col { max-width: 88%; }
+      .bubble { padding: 9px 12px; font-size: 0.875rem; }
+      .msg-row { gap: 6px; }
+      .avatar { width: 30px; height: 30px; font-size: 10px; }
+    }
+
+    @media (max-width: 360px) {
+      .bubble-col { max-width: 92%; }
+      .bubble { padding: 8px 10px; font-size: 0.85rem; }
+      .avatar { display: none; }
     }
   `],
 })

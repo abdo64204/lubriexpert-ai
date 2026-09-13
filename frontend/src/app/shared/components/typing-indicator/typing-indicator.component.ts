@@ -68,6 +68,15 @@ import { Component } from '@angular/core';
       0%, 60%, 100% { transform: translateY(0); opacity: 0.5; }
       30% { transform: translateY(-7px); opacity: 1; }
     }
+
+    @media (max-width: 480px) {
+      .ai-avatar { width: 30px; height: 30px; font-size: 9px; }
+      .dots-container { padding: 10px 14px; }
+    }
+
+    @media (max-width: 360px) {
+      .ai-avatar { display: none; }
+    }
   `],
 })
 export class TypingIndicatorComponent {}

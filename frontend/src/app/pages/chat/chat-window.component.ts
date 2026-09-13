@@ -81,10 +81,13 @@ import { QuickActionsComponent } from '../../shared/components/quick-actions/qui
     .chat-window {
       flex: 1;
       overflow-y: auto;
-      padding: 20px;
+      padding: 16px 20px;
       background: var(--bg-chat);
       display: flex;
       flex-direction: column;
+      overscroll-behavior-y: contain;
+      -webkit-overflow-scrolling: touch;
+      scroll-behavior: smooth;
     }
 
     /* ── Empty state ── */
@@ -95,31 +98,31 @@ import { QuickActionsComponent } from '../../shared/components/quick-actions/qui
       align-items: center;
       justify-content: center;
       text-align: center;
-      padding: 32px 20px;
+      padding: 24px 16px;
       max-width: 640px;
       margin: 0 auto;
       width: 100%;
     }
 
     .empty-icon {
-      font-size: 3.2rem;
-      margin-bottom: 16px;
+      font-size: clamp(2.4rem, 6vw, 3.2rem);
+      margin-bottom: 12px;
       line-height: 1;
     }
 
     .empty-title {
-      font-size: 1.55rem;
+      font-size: clamp(1.2rem, 4vw, 1.55rem);
       font-weight: 700;
       color: var(--text-primary);
-      margin-bottom: 12px;
+      margin-bottom: 10px;
       letter-spacing: -0.02em;
-      line-height: 1.2;
+      line-height: 1.25;
     }
 
     .empty-sub {
-      font-size: 0.925rem;
+      font-size: clamp(0.825rem, 2.5vw, 0.925rem);
       color: var(--text-secondary);
-      line-height: 1.7;
+      line-height: 1.6;
       max-width: 500px;
       margin-bottom: 8px;
     }
@@ -130,12 +133,12 @@ import { QuickActionsComponent } from '../../shared/components/quick-actions/qui
       color: var(--color-primary);
       text-transform: uppercase;
       letter-spacing: 0.07em;
-      margin-bottom: 28px;
+      margin-bottom: 20px;
     }
 
     .examples-section {
       width: 100%;
-      margin-bottom: 20px;
+      margin-bottom: 18px;
     }
 
     .examples-label {
@@ -165,6 +168,7 @@ import { QuickActionsComponent } from '../../shared/components/quick-actions/qui
       transition: all var(--transition);
       font-family: inherit;
       line-height: 1.4;
+      touch-action: manipulation;
 
       &:hover {
         border-color: var(--color-primary);
@@ -179,16 +183,17 @@ import { QuickActionsComponent } from '../../shared/components/quick-actions/qui
     .messages {
       display: flex;
       flex-direction: column;
-      gap: 3px;
+      gap: 4px;
       max-width: 880px;
       margin: 0 auto;
       width: 100%;
     }
 
     @media (max-width: 640px) {
-      .examples-grid { grid-template-columns: 1fr; }
-      .empty-title { font-size: 1.25rem; }
-      .chat-window { padding: 12px; }
+      .examples-grid { grid-template-columns: 1fr; gap: 6px; }
+      .empty-state { padding: 16px 8px; }
+      .chat-window { padding: 10px 8px; }
+      .messages { gap: 6px; }
     }
   `],
 })
