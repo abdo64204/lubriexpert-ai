@@ -99,8 +99,11 @@ class ConversationService {
 
 export const conversationService = new ConversationService();
 
-// Cleanup old conversations every hour
-setInterval(
+// Cleanup old conversations every hour (unref so it doesn't block serverless process exit)
+const cleanupTimer = setInterval(
   () => conversationService.cleanupOldConversations(),
   60 * 60 * 1000
 );
+if (cleanupTimer && typeof cleanupTimer.unref === 'function') {
+  cleanupTimer.unref();
+}

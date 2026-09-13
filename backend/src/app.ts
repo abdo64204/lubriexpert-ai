@@ -79,9 +79,11 @@ export function createApp(): express.Application {
   // General rate limiting for all routes
   app.use(generalRateLimit);
 
-  // API routes
+  // API routes — mounted on both '/api' and '/' for seamless compatibility with standalone and Vercel serverless rewrites
   app.use('/api', chatRoutes);
   app.use('/api', healthRoutes);
+  app.use('/', chatRoutes);
+  app.use('/', healthRoutes);
 
   // Serve static Angular frontend if built (single-service deployment option)
   const candidateFrontendPaths = [
@@ -116,3 +118,5 @@ export function createApp(): express.Application {
 
   return app;
 }
+
+export default createApp;
