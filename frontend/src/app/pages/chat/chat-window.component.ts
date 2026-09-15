@@ -7,17 +7,20 @@ import { LanguageService } from '../../services/language.service';
 import { ChatMessageComponent } from '../../shared/components/message/chat-message.component';
 import { TypingIndicatorComponent } from '../../shared/components/typing-indicator/typing-indicator.component';
 import { QuickActionsComponent } from '../../shared/components/quick-actions/quick-actions.component';
+import { AppIconComponent } from '../../shared/components/icon/app-icon.component';
 
 @Component({
   selector: 'app-chat-window',
   standalone: true,
-  imports: [NgIf, NgFor, ChatMessageComponent, TypingIndicatorComponent, QuickActionsComponent],
+  imports: [NgIf, NgFor, ChatMessageComponent, TypingIndicatorComponent, QuickActionsComponent, AppIconComponent],
   template: `
     <div class="chat-window" #scrollEl>
 
       <!-- ──── EMPTY STATE ──── -->
       <div class="empty-state" *ngIf="messages.length === 0 && !isLoading">
-        <div class="empty-icon">🛢️</div>
+        <div class="empty-brand-badge" aria-hidden="true">
+          <app-icon name="brand-mark" [size]="48" />
+        </div>
 
         <h2 class="empty-title">
           {{ langService.t('خبير التشحيم الذكي', 'AI Lubrication Expert') }}
@@ -104,10 +107,23 @@ import { QuickActionsComponent } from '../../shared/components/quick-actions/qui
       width: 100%;
     }
 
-    .empty-icon {
-      font-size: clamp(2.4rem, 6vw, 3.2rem);
-      margin-bottom: 12px;
-      line-height: 1;
+    .empty-brand-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 76px;
+      height: 76px;
+      border-radius: 20px;
+      background: var(--bg-card);
+      border: 1.5px solid var(--border-color);
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 16px;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+      }
     }
 
     .empty-title {
@@ -174,6 +190,11 @@ import { QuickActionsComponent } from '../../shared/components/quick-actions/qui
         border-color: var(--color-primary);
         color: var(--color-primary);
         background: var(--color-primary-light);
+      }
+
+      &:focus-visible {
+        outline: 2px solid var(--color-primary);
+        outline-offset: 2px;
       }
     }
 

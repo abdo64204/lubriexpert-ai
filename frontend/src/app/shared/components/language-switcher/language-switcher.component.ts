@@ -1,14 +1,20 @@
 import { Component, inject } from '@angular/core';
 import { LanguageService } from '../../../services/language.service';
 import { Language } from '../../../models/chat.models';
+import { AppIconComponent } from '../icon/app-icon.component';
 
 @Component({
   selector: 'app-language-switcher',
   standalone: true,
+  imports: [AppIconComponent],
   template: `
     <div class="lang-switcher" role="group" aria-label="Language selector">
+      <span class="globe-wrapper" aria-hidden="true">
+        <app-icon name="globe" [size]="14" />
+      </span>
       <button
         class="lang-btn"
+        type="button"
         [class.active]="langService.language() === 'ar'"
         (click)="setLang('ar')"
         title="العربية"
@@ -17,6 +23,7 @@ import { Language } from '../../../models/chat.models';
       <span class="sep" aria-hidden="true">|</span>
       <button
         class="lang-btn"
+        type="button"
         [class.active]="langService.language() === 'en'"
         (click)="setLang('en')"
         title="English"
@@ -28,7 +35,14 @@ import { Language } from '../../../models/chat.models';
     .lang-switcher {
       display: flex;
       align-items: center;
-      gap: 2px;
+      gap: 3px;
+    }
+
+    .globe-wrapper {
+      display: inline-flex;
+      align-items: center;
+      color: var(--text-muted);
+      margin-inline-end: 2px;
     }
 
     .lang-btn {
@@ -54,6 +68,11 @@ import { Language } from '../../../models/chat.models';
         background: var(--bg-hover);
         color: var(--text-primary);
       }
+
+      &:focus-visible {
+        outline: 2px solid var(--color-primary);
+        outline-offset: 1px;
+      }
     }
 
     .sep {
@@ -63,6 +82,7 @@ import { Language } from '../../../models/chat.models';
     }
 
     @media (max-width: 480px) {
+      .globe-wrapper { display: none; }
       .lang-btn {
         padding: 4px 5px;
         font-size: 0.75rem;

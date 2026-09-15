@@ -4,12 +4,13 @@ import {
 import { NgIf } from '@angular/common';
 import { ChatMessage } from '../../../models/chat.models';
 import { LanguageService } from '../../../services/language.service';
+import { AppIconComponent } from '../icon/app-icon.component';
 import { marked } from 'marked';
 
 @Component({
   selector: 'app-chat-message',
   standalone: true,
-  imports: [NgIf],
+  imports: [NgIf, AppIconComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div
@@ -18,7 +19,9 @@ import { marked } from 'marked';
       [class.ai-row]="message.role === 'assistant'"
     >
       <!-- AI Avatar -->
-      <div class="avatar ai-av" *ngIf="message.role === 'assistant'">AI</div>
+      <div class="avatar ai-av" *ngIf="message.role === 'assistant'" aria-label="LubriExpert AI">
+        <app-icon name="brand-mark" [size]="20" />
+      </div>
 
       <!-- Bubble + Meta -->
       <div class="bubble-col" [class.user-col]="message.role === 'user'">
@@ -40,7 +43,8 @@ import { marked } from 'marked';
 
           <!-- Error -->
           <div *ngIf="message.error" class="error-msg">
-            ⚠️ {{ message.content }}
+            <app-icon name="alert-triangle" [size]="16" class="error-icon" />
+            <span>{{ message.content }}</span>
           </div>
         </div>
 
@@ -49,20 +53,48 @@ import { marked } from 'marked';
           <span class="ts">{{ formatTime(message.timestamp) }}</span>
 
           <div class="actions" *ngIf="message.role === 'assistant' && !message.error && !message.isLoading">
-            <button class="act-btn" (click)="copy()" [title]="langService.t('نسخ','Copy')">
-              {{ copied ? '✓' : '📋' }}
+            <button
+              class="act-btn"
+              (click)="copy()"
+              [title]="langService.t('نسخ','Copy')"
+              [attr.aria-label]="langService.t('نسخ الرد', 'Copy response')"
+            >
+              <app-icon [name]="copied ? 'check' : 'copy'" [size]="14" />
             </button>
-            <button class="act-btn" (click)="regenerate.emit()" [title]="langService.t('إعادة المحاولة','Regenerate')">
-              🔄
+            <button
+              class="act-btn"
+              (click)="regenerate.emit()"
+              [title]="langService.t('إعادة المحاولة','Regenerate')"
+              [attr.aria-label]="langService.t('إعادة إنشاء الرد', 'Regenerate response')"
+            >
+              <app-icon name="refresh" [size]="14" />
             </button>
-            <button class="act-btn" [class.voted]="vote==='up'" (click)="castVote('up')" title="👍">👍</button>
-            <button class="act-btn" [class.voted]="vote==='down'" (click)="castVote('down')" title="👎">👎</button>
+            <button
+              class="act-btn"
+              [class.voted]="vote==='up'"
+              (click)="castVote('up')"
+              title="Helpful"
+              [attr.aria-label]="langService.t('مفيد', 'Helpful response')"
+            >
+              <app-icon name="thumb-up" [size]="14" />
+            </button>
+            <button
+              class="act-btn"
+              [class.voted]="vote==='down'"
+              (click)="castVote('down')"
+              title="Not helpful"
+              [attr.aria-label]="langService.t('غير مفيد', 'Not helpful response')"
+            >
+              <app-icon name="thumb-down" [size]="14" />
+            </button>
           </div>
         </div>
       </div>
 
       <!-- User Avatar -->
-      <div class="avatar user-av" *ngIf="message.role === 'user'">👤</div>
+      <div class="avatar user-av" *ngIf="message.role === 'user'" aria-label="User">
+        <app-icon name="user" [size]="17" />
+      </div>
     </div>
   `,
   styles: [`
@@ -95,15 +127,15 @@ import { marked } from 'marked';
     }
 
     .ai-av {
-      background: var(--color-primary);
-      color: white;
-      font-size: 10px;
+      background: var(--bg-card);
+      border: 1.5px solid var(--border-color);
+      box-shadow: var(--shadow-sm);
     }
 
     .user-av {
       background: var(--bg-hover);
-      border: 1px solid var(--border-color);
-      font-size: 15px;
+      border: 1.5px solid var(--border-color);
+      color: var(--text-secondary);
     }
 
     .bubble-col {
@@ -160,7 +192,14 @@ import { marked } from 'marked';
       color: var(--color-danger);
     }
 
-    .error-msg { font-size: 0.875rem; }
+    .error-msg {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.875rem;
+
+      .error-icon { flex-shrink: 0; }
+    }
 
     .meta-row {
       display: flex;
@@ -209,7 +248,13 @@ import { marked } from 'marked';
       touch-action: manipulation;
 
       &:hover, &:active { background: var(--bg-hover); opacity: 1; }
-      &.voted { opacity: 1; }
+      &.voted { opacity: 1; color: var(--color-primary); }
+
+      &:focus-visible {
+        outline: 2px solid var(--color-primary);
+        outline-offset: 1px;
+        opacity: 1;
+      }
     }
 
     @media (max-width: 640px) {

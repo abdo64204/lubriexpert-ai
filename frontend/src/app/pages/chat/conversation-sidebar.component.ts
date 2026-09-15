@@ -4,17 +4,22 @@ import { ConversationService } from '../../services/conversation.service';
 import { LanguageService } from '../../services/language.service';
 import { ChatService } from '../../services/chat.service';
 import { Conversation } from '../../models/chat.models';
+import { AppIconComponent } from '../../shared/components/icon/app-icon.component';
 
 @Component({
   selector: 'app-conversation-sidebar',
   standalone: true,
-  imports: [NgIf, NgFor],
+  imports: [NgIf, NgFor, AppIconComponent],
   template: `
     <aside class="sidebar">
       <!-- Header -->
       <div class="sb-header">
-        <button class="new-chat-btn" (click)="newChat()">
-          <span>✏️</span>
+        <button
+          class="new-chat-btn"
+          (click)="newChat()"
+          [attr.aria-label]="langService.t('محادثة جديدة', 'New Chat')"
+        >
+          <app-icon name="plus" [size]="16" />
           <span>{{ langService.t('محادثة جديدة', 'New Chat') }}</span>
         </button>
       </div>
@@ -40,8 +45,13 @@ import { Conversation } from '../../models/chat.models';
             <span class="conv-title">{{ conv.title }}</span>
             <span class="conv-date">{{ relativeTime(conv.updatedAt) }}</span>
           </div>
-          <button class="del-btn" (click)="del($event, conv)" [title]="langService.t('حذف','Delete')">
-            🗑️
+          <button
+            class="del-btn"
+            (click)="del($event, conv)"
+            [title]="langService.t('حذف','Delete')"
+            [attr.aria-label]="langService.t('حذف المحادثة', 'Delete conversation')"
+          >
+            <app-icon name="trash" [size]="14" />
           </button>
         </div>
       </div>
@@ -50,7 +60,8 @@ import { Conversation } from '../../models/chat.models';
       <div class="sb-footer">
         <div class="ai-status">
           <span class="status-dot"></span>
-          {{ langService.t('مدعوم بالذكاء الاصطناعي', 'Powered by AI') }}
+          <app-icon name="sparkles" [size]="13" />
+          <span>{{ langService.t('مدعوم بالذكاء الاصطناعي', 'Powered by AI') }}</span>
         </div>
       </div>
     </aside>
@@ -94,6 +105,10 @@ import { Conversation } from '../../models/chat.models';
       touch-action: manipulation;
 
       &:hover { background: var(--color-primary-dark); }
+      &:focus-visible {
+        outline: 2px solid var(--color-primary);
+        outline-offset: 2px;
+      }
     }
 
     .sb-body {

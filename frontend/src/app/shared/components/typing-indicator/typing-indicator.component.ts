@@ -1,11 +1,15 @@
 import { Component } from '@angular/core';
+import { AppIconComponent } from '../icon/app-icon.component';
 
 @Component({
   selector: 'app-typing-indicator',
   standalone: true,
+  imports: [AppIconComponent],
   template: `
-    <div class="typing-indicator">
-      <div class="ai-avatar"><span>AI</span></div>
+    <div class="typing-indicator" role="status" aria-live="polite" aria-label="LubriExpert AI is typing">
+      <div class="ai-avatar" aria-hidden="true">
+        <app-icon name="brand-mark" [size]="20" />
+      </div>
       <div class="dots-container">
         <span class="dot"></span>
         <span class="dot"></span>
@@ -25,13 +29,12 @@ import { Component } from '@angular/core';
       width: 34px;
       height: 34px;
       border-radius: 50%;
-      background: var(--color-primary);
-      color: white;
+      background: var(--bg-card);
+      border: 1.5px solid var(--border-color);
+      box-shadow: var(--shadow-sm);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 10px;
-      font-weight: 700;
       flex-shrink: 0;
     }
 
@@ -70,7 +73,7 @@ import { Component } from '@angular/core';
     }
 
     @media (max-width: 480px) {
-      .ai-avatar { width: 30px; height: 30px; font-size: 9px; }
+      .ai-avatar { width: 30px; height: 30px; }
       .dots-container { padding: 10px 14px; }
     }
 

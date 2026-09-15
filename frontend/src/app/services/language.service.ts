@@ -8,6 +8,10 @@ export class LanguageService {
   private _language = signal<Language>(this.loadLanguage());
   readonly language = this._language.asReadonly();
 
+  constructor() {
+    this.applyToDocument(this._language());
+  }
+
   private loadLanguage(): Language {
     const stored = localStorage.getItem(STORAGE_KEY);
     return (stored === 'ar' || stored === 'en') ? stored : 'en';

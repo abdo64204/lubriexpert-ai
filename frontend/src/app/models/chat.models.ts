@@ -43,7 +43,7 @@ export interface ChatResponse {
 
 export interface QuickAction {
   id: string;
-  icon: string;
+  iconName: 'car' | 'factory' | 'gear' | 'droplet' | 'search' | 'scale';
   labelAr: string;
   labelEn: string;
   messageAr: string;
@@ -53,7 +53,7 @@ export interface QuickAction {
 export const QUICK_ACTIONS: QuickAction[] = [
   {
     id: 'automotive',
-    icon: '🚗',
+    iconName: 'car',
     labelAr: 'زيت السيارات',
     labelEn: 'Automotive Oil',
     messageAr: 'أحتاج مساعدة في اختيار زيت المحرك المناسب لسيارتي.',
@@ -61,7 +61,7 @@ export const QUICK_ACTIONS: QuickAction[] = [
   },
   {
     id: 'industrial',
-    icon: '🏭',
+    iconName: 'factory',
     labelAr: 'التشحيم الصناعي',
     labelEn: 'Industrial Lubrication',
     messageAr: 'أحتاج معلومات عن زيوت التشحيم الصناعية.',
@@ -69,7 +69,7 @@ export const QUICK_ACTIONS: QuickAction[] = [
   },
   {
     id: 'machinery',
-    icon: '⚙️',
+    iconName: 'gear',
     labelAr: 'المعدات والآلات',
     labelEn: 'Machinery',
     messageAr: 'أحتاج زيت مناسب لمعدة في مصنع.',
@@ -77,7 +77,7 @@ export const QUICK_ACTIONS: QuickAction[] = [
   },
   {
     id: 'grease',
-    icon: '🛢️',
+    iconName: 'droplet',
     labelAr: 'الجريس والشحوم',
     labelEn: 'Grease',
     messageAr: 'ما هو الفرق بين NLGI 2 و NLGI 3؟',
@@ -85,7 +85,7 @@ export const QUICK_ACTIONS: QuickAction[] = [
   },
   {
     id: 'mobil',
-    icon: '🔍',
+    iconName: 'search',
     labelAr: 'منتجات موبيل',
     labelEn: 'Mobil Products',
     messageAr: 'أريد معرفة المزيد عن منتجات موبيل وExxonMobil.',
@@ -93,7 +93,7 @@ export const QUICK_ACTIONS: QuickAction[] = [
   },
   {
     id: 'compare',
-    icon: '⚖️',
+    iconName: 'scale',
     labelAr: 'مقارنة الزيوت',
     labelEn: 'Compare Oils',
     messageAr: 'ما هو الفرق بين 5W-30 و 5W-40؟',

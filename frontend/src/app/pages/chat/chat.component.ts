@@ -20,8 +20,7 @@ import { ViewportService } from '../../services/viewport.service';
       <app-conversation-sidebar class="sidebar-component" (closed)="onConversationSelected()" />
       <div class="sidebar-overlay" *ngIf="sidebarOpen" (click)="sidebarOpen = false"></div>
       <div class="main-area">
-        <app-header />
-        <button class="mobile-sidebar-btn" (click)="sidebarOpen = !sidebarOpen" aria-label="Toggle Conversations">☰</button>
+        <app-header [sidebarOpen]="sidebarOpen" (toggleSidebar)="sidebarOpen = !sidebarOpen" />
         <div class="chat-body">
           <app-chat-window #chatWindow [messages]="currentMessages()" [isLoading]="isLoading()"
             (exampleClicked)="onExampleOrQuickAction($event)" (regenerate)="onRegenerate()" />
@@ -87,26 +86,6 @@ import { ViewportService } from '../../services/viewport.service';
       scrollbar-width: none;
       &::-webkit-scrollbar { display: none; }
     }
-    .mobile-sidebar-btn {
-      display: none;
-      position: absolute;
-      top: 13px;
-      inset-inline-start: 10px;
-      z-index: 100;
-      background: var(--bg-card);
-      border: 1px solid var(--border-color);
-      border-radius: var(--border-radius-sm);
-      padding: 0;
-      width: 36px;
-      height: 36px;
-      cursor: pointer;
-      color: var(--text-secondary);
-      font-size: 1.1rem;
-      align-items: center;
-      justify-content: center;
-      box-shadow: var(--shadow-sm);
-      touch-action: manipulation;
-    }
     .sidebar-overlay { display: none; }
     @media (max-width: 768px) {
       .sidebar-component {
@@ -120,7 +99,6 @@ import { ViewportService } from '../../services/viewport.service';
         box-shadow: var(--shadow-lg);
       }
       .chat-layout.sidebar-open .sidebar-component { inset-inline-start: 0; }
-      .mobile-sidebar-btn { display: flex; }
       .sidebar-overlay {
         display: block;
         position: fixed;

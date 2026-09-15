@@ -2,19 +2,22 @@ import { Component, Output, EventEmitter, inject } from '@angular/core';
 import { NgFor } from '@angular/common';
 import { QUICK_ACTIONS, QuickAction } from '../../../models/chat.models';
 import { LanguageService } from '../../../services/language.service';
+import { AppIconComponent } from '../icon/app-icon.component';
 
 @Component({
   selector: 'app-quick-actions',
   standalone: true,
-  imports: [NgFor],
+  imports: [NgFor, AppIconComponent],
   template: `
-    <div class="quick-actions">
+    <div class="quick-actions" role="toolbar" [attr.aria-label]="langService.t('إجراءات سريعة', 'Quick actions')">
       <button
         *ngFor="let a of actions"
         class="chip"
+        type="button"
         (click)="actionClicked.emit(langService.language() === 'ar' ? a.messageAr : a.messageEn)"
+        [attr.aria-label]="langService.language() === 'ar' ? a.labelAr : a.labelEn"
       >
-        <span class="chip-icon">{{ a.icon }}</span>
+        <app-icon [name]="a.iconName" [size]="14" class="chip-icon" />
         <span class="chip-label">{{ langService.language() === 'ar' ? a.labelAr : a.labelEn }}</span>
       </button>
     </div>
@@ -30,7 +33,7 @@ import { LanguageService } from '../../../services/language.service';
     .chip {
       display: inline-flex;
       align-items: center;
-      gap: 5px;
+      gap: 6px;
       padding: 7px 13px;
       background: var(--bg-quick-action);
       border: 1px solid var(--border-color);
@@ -53,7 +56,15 @@ import { LanguageService } from '../../../services/language.service';
         box-shadow: 0 4px 12px rgba(26, 111, 196, 0.28);
       }
 
-      .chip-icon { font-size: 0.9rem; }
+      &:focus-visible {
+        outline: 2px solid var(--color-primary);
+        outline-offset: 2px;
+      }
+
+      .chip-icon {
+        display: inline-flex;
+        align-items: center;
+      }
     }
 
     @media (max-width: 640px) {

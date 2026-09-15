@@ -3,34 +3,92 @@ import { RouterLink } from '@angular/router';
 import { LanguageService } from '../../services/language.service';
 import { ThemeService } from '../../services/theme.service';
 import { AppHeaderComponent } from '../../shared/components/header/app-header.component';
+import { AppIconComponent } from '../../shared/components/icon/app-icon.component';
 import { Language, Theme } from '../../models/chat.models';
 
 @Component({
   selector: 'app-settings',
   standalone: true,
-  imports: [RouterLink, AppHeaderComponent],
+  imports: [RouterLink, AppHeaderComponent, AppIconComponent],
   template: `
     <div class="settings-layout">
-      <app-header />
+      <app-header [showSidebarToggle]="false" />
       <main class="settings-main">
         <div class="settings-container">
           <div class="settings-header">
-            <a routerLink="/chat" class="back-btn">← {{ langService.t('رجوع', 'Back') }}</a>
+            <a
+              routerLink="/chat"
+              class="back-btn"
+              [attr.aria-label]="langService.t('رجوع إلى المحادثة', 'Back to chat')"
+            >
+              <app-icon name="arrow-left" [size]="16" class="back-icon" />
+              <span>{{ langService.t('رجوع', 'Back') }}</span>
+            </a>
             <h1>{{ langService.t('الإعدادات', 'Settings') }}</h1>
           </div>
           <section class="settings-section">
             <h2>{{ langService.t('اللغة', 'Language') }}</h2>
-            <div class="option-group">
-              <button class="option-btn" [class.active]="langService.language() === 'ar'" (click)="setLanguage('ar')"><span>🇸🇦</span> العربية</button>
-              <button class="option-btn" [class.active]="langService.language() === 'en'" (click)="setLanguage('en')"><span>🇺🇸</span> English</button>
+            <div class="option-group" role="radiogroup" [attr.aria-label]="langService.t('اختيار اللغة', 'Select language')">
+              <button
+                type="button"
+                class="option-btn"
+                [class.active]="langService.language() === 'ar'"
+                (click)="setLanguage('ar')"
+                role="radio"
+                [attr.aria-checked]="langService.language() === 'ar'"
+              >
+                <app-icon name="globe" [size]="16" />
+                <span>العربية</span>
+              </button>
+              <button
+                type="button"
+                class="option-btn"
+                [class.active]="langService.language() === 'en'"
+                (click)="setLanguage('en')"
+                role="radio"
+                [attr.aria-checked]="langService.language() === 'en'"
+              >
+                <app-icon name="globe" [size]="16" />
+                <span>English</span>
+              </button>
             </div>
           </section>
           <section class="settings-section">
             <h2>{{ langService.t('المظهر', 'Appearance') }}</h2>
-            <div class="option-group">
-              <button class="option-btn" [class.active]="themeService.theme() === 'light'" (click)="setTheme('light')">☀️ {{ langService.t('فاتح', 'Light') }}</button>
-              <button class="option-btn" [class.active]="themeService.theme() === 'dark'" (click)="setTheme('dark')">🌙 {{ langService.t('داكن', 'Dark') }}</button>
-              <button class="option-btn" [class.active]="themeService.theme() === 'system'" (click)="setTheme('system')">🖥️ {{ langService.t('النظام', 'System') }}</button>
+            <div class="option-group" role="radiogroup" [attr.aria-label]="langService.t('اختيار المظهر', 'Select theme')">
+              <button
+                type="button"
+                class="option-btn"
+                [class.active]="themeService.theme() === 'light'"
+                (click)="setTheme('light')"
+                role="radio"
+                [attr.aria-checked]="themeService.theme() === 'light'"
+              >
+                <app-icon name="sun" [size]="16" />
+                <span>{{ langService.t('فاتح', 'Light') }}</span>
+              </button>
+              <button
+                type="button"
+                class="option-btn"
+                [class.active]="themeService.theme() === 'dark'"
+                (click)="setTheme('dark')"
+                role="radio"
+                [attr.aria-checked]="themeService.theme() === 'dark'"
+              >
+                <app-icon name="moon" [size]="16" />
+                <span>{{ langService.t('داكن', 'Dark') }}</span>
+              </button>
+              <button
+                type="button"
+                class="option-btn"
+                [class.active]="themeService.theme() === 'system'"
+                (click)="setTheme('system')"
+                role="radio"
+                [attr.aria-checked]="themeService.theme() === 'system'"
+              >
+                <app-icon name="settings" [size]="16" />
+                <span>{{ langService.t('النظام', 'System') }}</span>
+              </button>
             </div>
           </section>
           <section class="settings-section">
@@ -40,7 +98,10 @@ import { Language, Theme } from '../../models/chat.models';
               <div class="about-row"><span class="about-label">{{ langService.t('الإصدار', 'Version') }}</span><span>1.0.0</span></div>
               <div class="about-row"><span class="about-label">{{ langService.t('الذكاء الاصطناعي', 'AI') }}</span><span>{{ langService.t('مدعوم بنماذج لغوية متقدمة', 'Powered by Advanced Language Models') }}</span></div>
               <div class="about-row"><span class="about-label">{{ langService.t('التخصص', 'Specialty') }}</span><span>{{ langService.t('التشحيم الصناعي والسيارات', 'Automotive & Industrial Lubrication') }}</span></div>
-              <div class="disclaimer">⚠️ {{ langService.t('دائماً تحقق من توصيات الشركة المصنعة لأي توصيات تشحيم.', 'Always verify manufacturer specifications for any lubrication recommendations.') }}</div>
+              <div class="disclaimer">
+                <app-icon name="alert-triangle" [size]="16" class="disclaimer-icon" />
+                <span>{{ langService.t('دائماً تحقق من توصيات الشركة المصنعة لأي توصيات تشحيم.', 'Always verify manufacturer specifications for any lubrication recommendations.') }}</span>
+              </div>
             </div>
           </section>
         </div>
@@ -72,14 +133,26 @@ import { Language, Theme } from '../../models/chat.models';
       text-decoration: none;
       font-size: 0.875rem;
       font-weight: 600;
-      padding: 6px 10px;
+      padding: 6px 12px;
       border-radius: var(--border-radius-sm);
       background: var(--bg-hover);
       display: inline-flex;
       align-items: center;
+      gap: 6px;
       touch-action: manipulation;
+      transition: background 0.15s, color 0.15s;
+
+      &:focus-visible {
+        outline: 2px solid var(--color-primary);
+        outline-offset: 2px;
+      }
     }
     .back-btn:hover { background: var(--color-primary-light); }
+
+    [dir='rtl'] .back-icon {
+      transform: scaleX(-1);
+    }
+
     .settings-section {
       background: var(--bg-card);
       border: 1px solid var(--border-color);
@@ -98,9 +171,9 @@ import { Language, Theme } from '../../models/chat.models';
     }
     .option-group { display: flex; gap: 8px; flex-wrap: wrap; }
     .option-btn {
-      display: flex;
+      display: inline-flex;
       align-items: center;
-      gap: 6px;
+      gap: 7px;
       padding: 10px 16px;
       min-height: 40px;
       border: 1.5px solid var(--border-color);
@@ -113,6 +186,11 @@ import { Language, Theme } from '../../models/chat.models';
       transition: all 0.15s;
       font-family: inherit;
       touch-action: manipulation;
+
+      &:focus-visible {
+        outline: 2px solid var(--color-primary);
+        outline-offset: 2px;
+      }
     }
     .option-btn.active {
       border-color: var(--color-primary);
@@ -144,6 +222,15 @@ import { Language, Theme } from '../../models/chat.models';
       padding: 10px 12px;
       line-height: 1.5;
       border-inline-start: 3px solid var(--color-accent);
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+
+      .disclaimer-icon {
+        flex-shrink: 0;
+        margin-top: 2px;
+        color: var(--color-accent);
+      }
     }
     @media (max-width: 480px) {
       .settings-main { padding: 16px 12px max(16px, env(safe-area-inset-bottom)); }

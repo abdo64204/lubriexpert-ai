@@ -2,11 +2,12 @@ import { Component, Output, EventEmitter, Input, inject, ViewChild, ElementRef }
 import { NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { LanguageService } from '../../services/language.service';
+import { AppIconComponent } from '../../shared/components/icon/app-icon.component';
 
 @Component({
   selector: 'app-chat-input',
   standalone: true,
-  imports: [NgIf, FormsModule],
+  imports: [NgIf, FormsModule, AppIconComponent],
   template: `
     <div class="input-area">
       <div class="input-wrapper">
@@ -30,13 +31,14 @@ import { LanguageService } from '../../services/language.service';
         ></textarea>
         <button
           class="send-btn"
+          type="button"
           [disabled]="isLoading || !inputText.trim()"
           (click)="onSend()"
           [title]="langService.t('إرسال', 'Send')"
-          aria-label="Send message"
+          [attr.aria-label]="langService.t('إرسال الرسالة', 'Send message')"
         >
-          <span *ngIf="!isLoading">➤</span>
-          <span *ngIf="isLoading" class="spinner">⟳</span>
+          <app-icon *ngIf="!isLoading" name="send" [size]="18" />
+          <app-icon *ngIf="isLoading" name="spinner" [size]="18" class="spinner" />
         </button>
       </div>
       <p class="input-disclaimer">
@@ -120,6 +122,11 @@ import { LanguageService } from '../../services/language.service';
     .send-btn:hover:not(:disabled) {
       background: var(--color-primary-dark);
       transform: scale(1.04);
+    }
+
+    .send-btn:focus-visible {
+      outline: 2px solid var(--color-primary);
+      outline-offset: 2px;
     }
 
     .send-btn:disabled {
