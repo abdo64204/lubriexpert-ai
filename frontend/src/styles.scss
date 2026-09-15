@@ -9,43 +9,49 @@
 // CSS Custom Properties — Light Theme (default)
 // ============================================================
 :root {
-  // Brand
-  --color-primary: #1a6fc4;
-  --color-primary-dark: #1558a0;
-  --color-primary-light: rgba(26, 111, 196, 0.1);
-  --color-accent: #f0a500;
-  --color-success: #38a169;
-  --color-danger: #e53e3e;
+  // Brand — Industrial / Petrochemical
+  --color-primary: #0F5B9E;
+  --color-primary-dark: #0A4375;
+  --color-primary-light: rgba(15, 91, 158, 0.08);
+  --color-accent: #D97706;
+  --color-success: #10B981;
+  --color-danger: #EF4444;
 
   // Backgrounds
-  --bg-app: #f0f2f5;
-  --bg-sidebar: #ffffff;
-  --bg-chat: #f8f9fb;
-  --bg-card: #ffffff;
-  --bg-input: #ffffff;
-  --bg-header: #ffffff;
-  --bg-hover: #f0f4f8;
-  --bg-user-bubble: #1a6fc4;
-  --bg-ai-bubble: #ffffff;
-  --bg-quick-action: #f4f6f9;
+  --bg-app: #F8FAFC;
+  --bg-sidebar: #FFFFFF;
+  --bg-chat: #F8FAFC;
+  --bg-card: #FFFFFF;
+  --bg-input: #FFFFFF;
+  --bg-header: #FFFFFF;
+  --bg-hover: #F1F5F9;
+  --bg-user-bubble: #0F5B9E;
+  --bg-ai-bubble: #FFFFFF;
+  --bg-quick-action: #F1F5F9;
 
   // Text
-  --text-primary: #1a1d23;
-  --text-secondary: #4a5568;
-  --text-muted: #718096;
-  --text-user-bubble: #ffffff;
-  --text-ai-bubble: #1a1d23;
-  --text-link: #1a6fc4;
+  --text-primary: #0F172A;
+  --text-secondary: #475569;
+  --text-muted: #64748B;
+  --text-user-bubble: #FFFFFF;
+  --text-ai-bubble: #0F172A;
+  --text-link: #0F5B9E;
 
   // Borders
-  --border-color: #e2e8f0;
-  --border-color-strong: #cbd5e0;
-  --border-focus: #1a6fc4;
+  --border-color: #E2E8F0;
+  --border-color-strong: #CBD5E1;
+  --border-focus: #0F5B9E;
+
+  // AI Titanium Avatar Tokens
+  --avatar-ai-bg: linear-gradient(135deg, #1E2638 0%, #0F172A 100%);
+  --avatar-ai-border: rgba(217, 119, 6, 0.45);
+  --avatar-ai-glow: 0 0 10px rgba(217, 119, 6, 0.2);
+  --avatar-ai-color: #F59E0B;
 
   // Shadows
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.07), 0 1px 2px rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.09);
-  --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.12);
+  --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
+  --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.08);
+  --shadow-lg: 0 10px 30px rgba(15, 23, 42, 0.12);
 
   // Layout
   --sidebar-width: 280px;
@@ -61,8 +67,8 @@
   --safe-right: env(safe-area-inset-right, 0px);
 
   // Misc
-  --typing-dot: #a0aec0;
-  --scrollbar-thumb: #cbd5e0;
+  --typing-dot: #94A3B8;
+  --scrollbar-thumb: #CBD5E1;
   --transition: 0.15s ease;
 }
 
@@ -70,33 +76,45 @@
 // Dark Theme
 // ============================================================
 [data-theme='dark'] {
-  --bg-app: #0d0f14;
-  --bg-sidebar: #161820;
-  --bg-chat: #111318;
-  --bg-card: #1c1e27;
-  --bg-input: #1c1e27;
-  --bg-header: #161820;
-  --bg-hover: #232633;
-  --bg-user-bubble: #1a6fc4;
-  --bg-ai-bubble: #1c1e27;
-  --bg-quick-action: #1c1e27;
+  --bg-app: #0B0F19;
+  --bg-sidebar: #131926;
+  --bg-chat: #0B0F19;
+  --bg-card: #131926;
+  --bg-input: #131926;
+  --bg-header: #131926;
+  --bg-hover: #1E2638;
+  --bg-user-bubble: #0F5B9E;
+  --bg-ai-bubble: #131926;
+  --bg-quick-action: #1E2638;
 
-  --text-primary: #e8eaf0;
-  --text-secondary: #9aa0b8;
-  --text-muted: #636880;
-  --text-user-bubble: #ffffff;
-  --text-ai-bubble: #e8eaf0;
-  --text-link: #5ba3e8;
+  --text-primary: #F1F5F9;
+  --text-secondary: #94A3B8;
+  --text-muted: #64748B;
+  --text-user-bubble: #FFFFFF;
+  --text-ai-bubble: #F1F5F9;
+  --text-link: #38BDF8;
 
-  --border-color: #252833;
-  --border-color-strong: #363a4e;
+  --color-primary: #38BDF8;
+  --color-primary-dark: #0284C7;
+  --color-primary-light: rgba(56, 189, 248, 0.12);
+  --color-accent: #F59E0B;
+
+  --border-color: #222F46;
+  --border-color-strong: #2D3D5B;
+  --border-focus: #38BDF8;
+
+  // AI Titanium Avatar Tokens
+  --avatar-ai-bg: linear-gradient(135deg, #131926 0%, #0B0F19 100%);
+  --avatar-ai-border: rgba(245, 158, 11, 0.5);
+  --avatar-ai-glow: 0 0 12px rgba(245, 158, 11, 0.25);
+  --avatar-ai-color: #F59E0B;
 
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
   --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5);
   --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.6);
 
-  --typing-dot: #636880;
-  --scrollbar-thumb: #363a4e;
+  --typing-dot: #64748B;
+  --scrollbar-thumb: #222F46;
 }
 
 // ============================================================

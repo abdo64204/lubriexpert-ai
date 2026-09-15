@@ -54,12 +54,14 @@ import { marked } from 'marked';
 
           <div class="actions" *ngIf="message.role === 'assistant' && !message.error && !message.isLoading">
             <button
-              class="act-btn"
+              class="act-btn copy-btn"
+              [class.copied]="copied"
               (click)="copy()"
-              [title]="langService.t('نسخ','Copy')"
-              [attr.aria-label]="langService.t('نسخ الرد', 'Copy response')"
+              [title]="copied ? langService.t('تم النسخ', 'Copied!') : langService.t('نسخ', 'Copy')"
+              [attr.aria-label]="copied ? langService.t('تم نسخ الرد', 'Copied response!') : langService.t('نسخ الرد', 'Copy response')"
             >
               <app-icon [name]="copied ? 'check' : 'copy'" [size]="14" />
+              <span *ngIf="copied" class="copied-label">{{ langService.t('تم النسخ', 'Copied') }}</span>
             </button>
             <button
               class="act-btn"
@@ -127,9 +129,10 @@ import { marked } from 'marked';
     }
 
     .ai-av {
-      background: var(--bg-card);
-      border: 1.5px solid var(--border-color);
-      box-shadow: var(--shadow-sm);
+      background: var(--avatar-ai-bg);
+      border: 1.5px solid var(--avatar-ai-border);
+      box-shadow: var(--avatar-ai-glow);
+      color: var(--avatar-ai-color);
     }
 
     .user-av {
@@ -257,6 +260,20 @@ import { marked } from 'marked';
       }
     }
 
+    .copy-btn.copied {
+      color: var(--color-success);
+      opacity: 1;
+      gap: 4px;
+      padding: 4px 8px;
+      background: rgba(16, 185, 129, 0.12);
+    }
+
+    .copied-label {
+      font-size: 0.72rem;
+      font-weight: 600;
+      line-height: 1;
+    }
+
     @media (max-width: 640px) {
       .bubble-col { max-width: 88%; }
       .bubble { padding: 9px 12px; font-size: 0.875rem; }
@@ -314,10 +331,41 @@ export class ChatMessageComponent implements OnInit, OnChanges {
   }
 
   copy(): void {
-    navigator.clipboard.writeText(this.message.content).then(() => {
+    const text = this.message.content;
+    const onSuccess = () => {
       this.copied = true;
-      setTimeout(() => (this.copied = false), 2000);
-    });
+      this.cdr.markForCheck();
+      setTimeout(() => {
+        this.copied = false;
+        this.cdr.markForCheck();
+      }, 2000);
+    };
+
+    if (navigator.clipboard?.writeText) {
+      navigator.clipboard.writeText(text).then(onSuccess).catch(() => {
+        this.fallbackCopy(text);
+        onSuccess();
+      });
+    } else {
+      this.fallbackCopy(text);
+      onSuccess();
+    }
+  }
+
+  private fallbackCopy(text: string): void {
+    try {
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      textarea.style.position = 'fixed';
+      textarea.style.opacity = '0';
+      document.body.appendChild(textarea);
+      textarea.focus();
+      textarea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textarea);
+    } catch {
+      // Ignore clipboard fallback error
+    }
   }
 
   castVote(type: 'up' | 'down'): void {

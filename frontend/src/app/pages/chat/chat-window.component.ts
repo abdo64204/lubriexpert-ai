@@ -2,12 +2,22 @@ import {
   Component, Input, Output, EventEmitter, ViewChild, ElementRef, inject, AfterViewInit, AfterViewChecked, OnChanges, SimpleChanges
 } from '@angular/core';
 import { NgIf, NgFor } from '@angular/common';
-import { ChatMessage, EXAMPLE_QUESTIONS } from '../../models/chat.models';
+import { ChatMessage } from '../../models/chat.models';
 import { LanguageService } from '../../services/language.service';
 import { ChatMessageComponent } from '../../shared/components/message/chat-message.component';
 import { TypingIndicatorComponent } from '../../shared/components/typing-indicator/typing-indicator.component';
 import { QuickActionsComponent } from '../../shared/components/quick-actions/quick-actions.component';
-import { AppIconComponent } from '../../shared/components/icon/app-icon.component';
+import { AppIconComponent, AppIconName } from '../../shared/components/icon/app-icon.component';
+
+interface CapabilityCard {
+  icon: AppIconName;
+  titleEn: string;
+  titleAr: string;
+  descEn: string;
+  descAr: string;
+  promptEn: string;
+  promptAr: string;
+}
 
 @Component({
   selector: 'app-chat-window',
@@ -23,35 +33,33 @@ import { AppIconComponent } from '../../shared/components/icon/app-icon.componen
         </div>
 
         <h2 class="empty-title">
-          {{ langService.t('خبير التشحيم الذكي', 'AI Lubrication Expert') }}
+          {{ langService.t('خبير التشحيم الهندسي الذكي', 'LubriExpert AI Engineering Assistant') }}
         </h2>
 
         <p class="empty-sub">
           {{ langService.t(
-            'اسألني عن زيوت السيارات والمحركات والتشحيم الصناعي والجريس والمواصفات ومنتجات موبيل.',
-            'Ask me about automotive oils, industrial lubricants, machinery oils, greases, viscosity, specifications, and Mobil products.'
+            'المساعد الهندسي المتخصص في زيوت المحركات، متطلبات التزييت الصناعي، درجات الشحوم، والمعايير والمواصفات التريبولوجية.',
+            'Enterprise lubrication engineering assistant for automotive specifications, industrial machinery, greases, and tribological diagnostics.'
           ) }}
         </p>
 
-        <p class="empty-tags">
-          {{ langService.t(
-            'سيارات • صناعي • آلات • جريس',
-            'Automotive • Industrial • Machinery • Grease'
-          ) }}
-        </p>
-
-        <!-- Example questions -->
-        <div class="examples-section">
-          <p class="examples-label">
-            {{ langService.t('أسئلة مثال:', 'Example questions:') }}
-          </p>
-          <div class="examples-grid">
-            <button
-              *ngFor="let q of exampleQs"
-              class="example-btn"
-              (click)="exampleClicked.emit(q)"
-            >{{ q }}</button>
-          </div>
+        <!-- ──── CAPABILITY CARDS ──── -->
+        <div class="capabilities-grid" role="region" [attr.aria-label]="langService.t('القدرات الفنية', 'Technical Capabilities')">
+          <button
+            *ngFor="let card of capabilityCards"
+            type="button"
+            class="capability-card"
+            (click)="onCardClick(card)"
+            [attr.aria-label]="langService.t(card.titleAr, card.titleEn)"
+          >
+            <div class="card-icon-badge" aria-hidden="true">
+              <app-icon [name]="card.icon" [size]="20" />
+            </div>
+            <div class="card-content">
+              <h3 class="card-title">{{ langService.t(card.titleAr, card.titleEn) }}</h3>
+              <p class="card-desc">{{ langService.t(card.descAr, card.descEn) }}</p>
+            </div>
+          </button>
         </div>
 
         <!-- Quick actions in empty state -->
@@ -61,7 +69,13 @@ import { AppIconComponent } from '../../shared/components/icon/app-icon.componen
       </div>
 
       <!-- ──── MESSAGES ──── -->
-      <div class="messages" *ngIf="messages.length > 0 || isLoading">
+      <div
+        class="messages"
+        *ngIf="messages.length > 0 || isLoading"
+        role="log"
+        aria-live="polite"
+        [attr.aria-label]="langService.t('سجل الرسائل', 'Chat message stream')"
+      >
         <app-chat-message
           *ngFor="let m of messages; trackBy: trackMessage"
           [message]="m"
@@ -102,7 +116,7 @@ import { AppIconComponent } from '../../shared/components/icon/app-icon.componen
       justify-content: center;
       text-align: center;
       padding: 24px 16px;
-      max-width: 640px;
+      max-width: 680px;
       margin: 0 auto;
       width: 100%;
     }
@@ -127,69 +141,57 @@ import { AppIconComponent } from '../../shared/components/icon/app-icon.componen
     }
 
     .empty-title {
-      font-size: clamp(1.2rem, 4vw, 1.55rem);
+      font-size: clamp(1.2rem, 3.8vw, 1.55rem);
       font-weight: 700;
       color: var(--text-primary);
-      margin-bottom: 10px;
+      margin-bottom: 8px;
       letter-spacing: -0.02em;
       line-height: 1.25;
     }
 
     .empty-sub {
-      font-size: clamp(0.825rem, 2.5vw, 0.925rem);
+      font-size: clamp(0.825rem, 2.4vw, 0.925rem);
       color: var(--text-secondary);
       line-height: 1.6;
-      max-width: 500px;
-      margin-bottom: 8px;
+      max-width: 560px;
+      margin-bottom: 24px;
     }
 
-    .empty-tags {
-      font-size: 0.72rem;
-      font-weight: 700;
-      color: var(--color-primary);
-      text-transform: uppercase;
-      letter-spacing: 0.07em;
+    /* ── Capabilities Grid ── */
+    .capabilities-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      width: 100%;
       margin-bottom: 20px;
     }
 
-    .examples-section {
-      width: 100%;
-      margin-bottom: 18px;
-    }
-
-    .examples-label {
-      font-size: 0.72rem;
-      font-weight: 700;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.07em;
-      margin-bottom: 10px;
-    }
-
-    .examples-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-    }
-
-    .example-btn {
-      padding: 10px 14px;
+    .capability-card {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 14px 16px;
       background: var(--bg-card);
       border: 1px solid var(--border-color);
-      border-radius: var(--border-radius-sm);
-      font-size: 0.82rem;
-      color: var(--text-secondary);
+      border-radius: var(--border-radius);
       cursor: pointer;
       text-align: start;
-      transition: all var(--transition);
       font-family: inherit;
-      line-height: 1.4;
+      box-shadow: var(--shadow-sm);
       touch-action: manipulation;
+      transition: border-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
 
       &:hover {
         border-color: var(--color-primary);
-        color: var(--color-primary);
-        background: var(--color-primary-light);
+        background: var(--bg-hover);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+
+        .card-icon-badge {
+          background: var(--color-primary);
+          color: #ffffff;
+          border-color: var(--color-primary);
+        }
       }
 
       &:focus-visible {
@@ -198,7 +200,45 @@ import { AppIconComponent } from '../../shared/components/icon/app-icon.componen
       }
     }
 
-    .empty-actions { width: 100%; }
+    .card-icon-badge {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 38px;
+      height: 38px;
+      min-width: 38px;
+      min-height: 38px;
+      border-radius: var(--border-radius-sm);
+      background: var(--color-primary-light);
+      color: var(--color-primary);
+      border: 1px solid rgba(15, 91, 158, 0.15);
+      flex-shrink: 0;
+      transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+    }
+
+    .card-content {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .card-title {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+      line-height: 1.35;
+    }
+
+    .card-desc {
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+      line-height: 1.45;
+      margin: 0;
+    }
+
+    .empty-actions {
+      width: 100%;
+    }
 
     /* ── Messages list ── */
     .messages {
@@ -210,11 +250,23 @@ import { AppIconComponent } from '../../shared/components/icon/app-icon.componen
       width: 100%;
     }
 
-    @media (max-width: 640px) {
-      .examples-grid { grid-template-columns: 1fr; gap: 6px; }
-      .empty-state { padding: 16px 8px; }
-      .chat-window { padding: 10px 8px; }
-      .messages { gap: 6px; }
+    @media (max-width: 600px) {
+      .capabilities-grid {
+        grid-template-columns: 1fr;
+        gap: 8px;
+      }
+      .capability-card {
+        padding: 12px 14px;
+      }
+      .empty-state {
+        padding: 16px 8px;
+      }
+      .chat-window {
+        padding: 10px 8px;
+      }
+      .messages {
+        gap: 6px;
+      }
     }
   `],
 })
@@ -229,8 +281,48 @@ export class ChatWindowComponent implements AfterViewInit, AfterViewChecked, OnC
   langService = inject(LanguageService);
   private prevScrollHeight = 0;
 
-  get exampleQs(): string[] {
-    return EXAMPLE_QUESTIONS[this.langService.language()];
+  readonly capabilityCards: CapabilityCard[] = [
+    {
+      icon: 'car',
+      titleEn: 'Engine Oil Match',
+      titleAr: 'مطابقة زيوت المحركات',
+      descEn: 'Find suitable engine oils based on viscosity, API, ACEA and OEM requirements.',
+      descAr: 'البحث عن زيوت المحركات المناسبة بناءً على اللزوجة وتصنيفات API وACEA ومتطلبات الصانع.',
+      promptEn: 'Find suitable engine oils matching viscosity, API, ACEA, and OEM requirements for modern vehicles.',
+      promptAr: 'ما هي زيوت المحركات المناسبة بناءً على درجة اللزوجة ومواصفات API و ACEA ومتطلبات الصانع؟',
+    },
+    {
+      icon: 'factory',
+      titleEn: 'Industrial Lubricants',
+      titleAr: 'الزيوت والتشحيم الصناعي',
+      descEn: 'Explore hydraulic, gearbox, compressor and industrial lubrication requirements.',
+      descAr: 'استكشاف متطلبات التزييت للأنظمة الهيدروليكية وصناديق التروس والضواغط والمعدات الصناعية.',
+      promptEn: 'Explore hydraulic, gearbox, compressor and industrial lubrication requirements and ISO VG recommendations.',
+      promptAr: 'ما هي متطلبات التزييت ودرجات لزوجة ISO VG الموصى بها للهيدروليك وصناديق التروس الصناعية والضواغط؟',
+    },
+    {
+      icon: 'gear',
+      titleEn: 'Grease & NLGI',
+      titleAr: 'الشحوم ودرجات NLGI',
+      descEn: 'Select grease based on NLGI grade, temperature, load and thickener compatibility.',
+      descAr: 'اختيار الشحم المناسب بناءً على درجة NLGI ودرجة الحرارة والأحمال وتوافق المغلظات.',
+      promptEn: 'How do I select grease based on NLGI grade, temperature, load, and thickener compatibility?',
+      promptAr: 'كيف أختار الشحم المناسب بناءً على درجة NLGI ودرجة حرارة التشغيل والحمل وتوافق المغلظات؟',
+    },
+    {
+      icon: 'scale',
+      titleEn: 'Specification Comparison',
+      titleAr: 'مقارنة المواصفات والمعايير',
+      descEn: 'Compare viscosity grades, specifications, lubricant types and equivalent products.',
+      descAr: 'مقارنة درجات اللزوجة والمواصفات وأنواع الزيوت والبدائل المكافئة للتشحيم.',
+      promptEn: 'Compare viscosity grades, specifications, lubricant types, and equivalent products in lubrication engineering.',
+      promptAr: 'قارن بين درجات اللزوجة والمواصفات وأنواع الزيوت والمنتجات البديلة المكافئة.',
+    },
+  ];
+
+  onCardClick(card: CapabilityCard): void {
+    const prompt = this.langService.language() === 'ar' ? card.promptAr : card.promptEn;
+    this.exampleClicked.emit(prompt);
   }
 
   trackMessage(_: number, m: ChatMessage): string {
